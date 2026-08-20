@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: clinic-booking-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clinic-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: "true"
+      - key: CLINIC_TIMEZONE
+        value: Africa/Nairobi
+      - key: MIN_BOOKING_NOTICE_MINUTES
+        value: "60"
+      - key: MAX_BOOKING_AHEAD_DAYS
+        value: "90"
+      - key: SEED_SAMPLE_DATA
+        value: "true"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: APP_ENV
+        value: production
+
+databases:
+  - name: clinic-db
+    plan: free
