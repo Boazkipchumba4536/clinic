@@ -273,6 +273,7 @@ CREATE DATABASE clinic_test;
 | --- | --- | --- |
 | `DATABASE_URL` | Postgres URL. `postgres://` and `postgresql://` are rewritten to `postgresql+asyncpg://` | `postgresql+asyncpg://clinic:clinic@localhost:5433/clinic` |
 | `DATABASE_SSL` | Enable TLS for hosted Postgres (Render) | `false` locally, `true` on Render |
+| `DATABASE_SSL_VERIFY` | Verify the server certificate. Render uses a self-signed cert, so leave `false` | `false` |
 | `CLINIC_TIMEZONE` | IANA zone for working hours and calendar dates | `Africa/Nairobi` |
 | `MIN_BOOKING_NOTICE_MINUTES` | Lead time before a slot may be booked | `60` |
 | `MAX_BOOKING_AHEAD_DAYS` | How far ahead a booking may be | `90` |

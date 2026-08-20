@@ -1,3 +1,4 @@
+import ssl
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -11,8 +12,24 @@ class Base(DeclarativeBase):
     pass
 
 
-def create_engine_from_url(database_url: str, ssl: bool = False, *, null_pool: bool = False):
-    connect_args = {"ssl": True} if ssl else {}
+def _asyncpg_ssl(verify: bool):
+    """Render Postgres presents a self-signed cert. Encrypt, don't verify, by default."""
+    if verify:
+        return True
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+    return context
+
+
+def create_engine_from_url(
+    database_url: str,
+    ssl: bool = False,
+    *,
+    null_pool: bool = False,
+    ssl_verify: bool = False,
+):
+    connect_args = {"ssl": _asyncpg_ssl(ssl_verify)} if ssl else {}
     kwargs: dict = {"pool_pre_ping": True, "connect_args": connect_args}
     if null_pool:
         kwargs["poolclass"] = NullPool
@@ -20,7 +37,11 @@ def create_engine_from_url(database_url: str, ssl: bool = False, *, null_pool: b
 
 
 settings = get_settings()
-engine = create_engine_from_url(settings.async_database_url, ssl=settings.use_database_ssl)
+engine = create_engine_from_url(
+    settings.async_database_url,
+    ssl=settings.use_database_ssl,
+    ssl_verify=settings.verify_database_ssl,
+)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 

@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = "postgresql+asyncpg://clinic:clinic@localhost:5433/clinic"
     database_ssl: bool = False
+    database_ssl_verify: bool = False
 
     clinic_timezone: str = "Africa/Nairobi"
     min_booking_notice_minutes: int = 60
@@ -53,6 +54,14 @@ class Settings(BaseSettings):
     @property
     def use_database_ssl(self) -> bool:
         return self.database_ssl or _url_requires_ssl(self.database_url)
+
+    @property
+    def verify_database_ssl(self) -> bool:
+        parsed = urlparse(self.database_url)
+        mode = dict(parse_qsl(parsed.query)).get("sslmode", "").lower()
+        if mode in {"verify-ca", "verify-full"}:
+            return True
+        return self.database_ssl_verify
 
     @property
     def sync_database_url(self) -> str:
