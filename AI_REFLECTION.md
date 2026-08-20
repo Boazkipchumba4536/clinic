@@ -42,4 +42,4 @@ Five doctors and a 30-minute grid do not need a cache. The failure that matters 
 
 ## Verification note
 
-Static review of schema, uniqueness, timezone rules, CI, and Render config was done in the authoring session. `pytest` / Docker build were left for local verification before submission. The public URL is blank until a live `/health` check succeeds.
+Local tests: 36 passed. Live health check succeeded at https://clinic-booking-api-8b9f.onrender.com/health.

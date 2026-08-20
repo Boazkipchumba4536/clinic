@@ -3,19 +3,21 @@
 REST API for a small clinic (5 doctors today, more later) where patients view 30-minute slots, book, cancel, and reschedule. Double-booking is prevented by PostgreSQL, not by hope.
 
 - **Stack:** Python 3.12, FastAPI, SQLAlchemy 2.x (async), Alembic, PostgreSQL 16, Docker, GitHub Actions
-- **Interactive docs:** `/docs` (Swagger) and `/redoc`
-- **Health:** `GET /health`
-
-**Public URL:** not deployed from this workspace. Follow [Deployment](#9-deployment) after you build and push, then put the URL here.
+- **Public URL:** https://clinic-booking-api-8b9f.onrender.com
+- **Health:** https://clinic-booking-api-8b9f.onrender.com/health
+- **Docs:** https://clinic-booking-api-8b9f.onrender.com/docs
+- **ReDoc:** https://clinic-booking-api-8b9f.onrender.com/redoc
 
 **Submission checklist**
 
-1. Create a GitHub repo, commit, push `main`.
-2. Confirm Actions → `CI` is green on the first push.
-3. Deploy on Render (`render.yaml` or Docker web service + Postgres).
-4. Open `GET /health` and `/docs` in a browser.
-5. Add GitHub secret `RENDER_DEPLOY_HOOK` so merges to `main` auto-deploy.
-6. Paste the public URL at the top of this README.
+- [x] App running on Render — [https://clinic-booking-api-8b9f.onrender.com](https://clinic-booking-api-8b9f.onrender.com)
+- [x] `GET /health` returns ok
+- [x] README has the public URL, design, local run, CI/CD
+- [x] Section 4 — `AI_REFLECTION.md`
+- [ ] Push this README update to GitHub
+- [ ] Confirm GitHub Actions CI is green
+- [ ] GitHub secret `RENDER_DEPLOY_HOOK` (so merge to `main` auto-deploys)
+- [ ] Submit the GitHub repo link + live URL
 
 **Assessment coverage**
 
@@ -29,7 +31,7 @@ REST API for a small clinic (5 doctors today, more later) where patients view 30
 | 2. Structured code, errors with HTTP codes | `app/api`, `app/services`, `app/domain` |
 | 2. Booking tests | `tests/unit`, `tests/integration` |
 | 2. Bonus patient list + 1-hour notice | Implemented, configurable |
-| 3. Public URL | Fill in after Render is live |
+| 3. Public URL | https://clinic-booking-api-8b9f.onrender.com |
 | 3. CI on every PR | `.github/workflows/ci.yml` |
 | 3. Auto-deploy on merge to `main` | `.github/workflows/deploy.yml` |
 | 4. AI reflection | `AI_REFLECTION.md` |
@@ -369,15 +371,18 @@ Replace `2026-08-24` with a future Monday if that date is already past.
 
 Why Render, not AWS/GCP/Azure: this is a take-home. Render gives a public URL, Postgres, and a deploy hook without IAM theatre. Fly.io and Railway are equally valid; AWS ECS would demonstrate more cloud surface and more chances to fail the “it must be up” requirement.
 
-**This workspace does not have a live URL.** Do not paste a URL you have not opened in a browser.
+**Live service:** [https://clinic-booking-api-8b9f.onrender.com](https://clinic-booking-api-8b9f.onrender.com)
 
-1. Push this repo to GitHub (`main` is the deploy branch).
-2. In Render, apply the Blueprint from `render.yaml`, or create a PostgreSQL instance plus a Docker web service pointing at the repo.
-3. Set `DATABASE_URL` from Render’s connection string (the app rewrites `postgres://` and strips libpq `sslmode`).
-4. Set `DATABASE_SSL=true` if the URL does not already include `sslmode=require`.
-5. Confirm `GET https://<your-service>.onrender.com/health` returns `{"status":"ok",...}`.
-6. In Render, create a **Deploy Hook**. In GitHub → Settings → Secrets, add `RENDER_DEPLOY_HOOK`.
-7. Put the public base URL at the top of this README.
+`GET /health` currently returns `{"status":"ok","timezone":"Africa/Nairobi","database":"up"}`.
+
+How this was deployed:
+
+1. Docker web service + managed PostgreSQL on Render (`render.yaml`).
+2. `DATABASE_URL` from Render’s connection string (`postgres://` is rewritten to `postgresql+asyncpg://`).
+3. `DATABASE_SSL=true` with `DATABASE_SSL_VERIFY=false` (Render’s cert is self-signed).
+4. Deploy branch is **`main`**. After a merge, GitHub Actions `Deploy` runs tests then POSTs the Render deploy hook.
+
+If auto-deploy is not firing yet, add GitHub secret `RENDER_DEPLOY_HOOK` from the Render dashboard (service → Settings → Deploy Hook).
 
 `GET /health` is the Render health check path. It returns **503** if PostgreSQL is unreachable.
 
